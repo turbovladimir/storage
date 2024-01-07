@@ -11,20 +11,7 @@ type Storage struct {
 }
 
 func New() *Storage {
-	os.Remove("sqlite-database.db") // I delete the file to avoid duplicated records.
-	// SQLite is a file based database.
-
-	slog.Info("Creating sqlite-database.db...")
-	file, err := os.Create("sqlite-database.db") // Create SQLite file
-
-	if err != nil {
-		panic(err)
-	}
-
-	file.Close()
-	slog.Info("sqlite-database.db created")
-
-	sqliteDatabase, _ := sql.Open("sqlite3", "./sqlite-database.db") // Open the created SQLite File
+	sqliteDatabase, _ := sql.Open("sqlite3", "./sqlite-database.db")
 
 	return &Storage{
 		sqliteDatabase,
@@ -33,6 +20,35 @@ func New() *Storage {
 
 func (s Storage) Close() {
 	s.db.Close()
+}
+
+func (s Storage) CreateDatabase() {
+	slog.Info("Creating sqlite-database.db...")
+	file, err := os.Create("sqlite-database.db")
+
+	if err != nil {
+		panic(err)
+	}
+
+	file.Close()
+	slog.Info("sqlite-database.db created")
+}
+
+func (s Storage) DropDatabase() {
+	os.Remove("sqlite-database.db")
+}
+
+func (s Storage) FillTable() {
+	// INSERT RECORDS
+	s.InsertStudent("0001", "Liana Kim", "Bachelor")
+	s.InsertStudent("0002", "Glen Rangel", "Bachelor")
+	s.InsertStudent("0003", "Martin Martins", "Master")
+	s.InsertStudent("0004", "Alayna Armitage", "PHD")
+	s.InsertStudent("0005", "Marni Benson", "Bachelor")
+	s.InsertStudent("0006", "Derrick Griffiths", "Master")
+	s.InsertStudent("0007", "Leigh Daly", "Bachelor")
+	s.InsertStudent("0008", "Marni Benson", "PHD")
+	s.InsertStudent("0009", "Klay Correa", "Bachelor")
 }
 
 func (s Storage) CreateTable() {
@@ -70,24 +86,34 @@ func (s Storage) InsertStudent(code string, name string, program string) {
 	}
 }
 
-func (s Storage) DisplayStudents() {
+type Student struct {
+	Id      int
+	Code    string
+	Name    string
+	Program string
+}
+
+func (s Storage) DisplayStudents() []Student {
 	row, err := s.db.Query("SELECT * FROM student ORDER BY name")
 	if err != nil {
 		panic(err)
 	}
 
 	defer row.Close()
+	students := []Student{}
+
 	for row.Next() { // Iterate and fetch the records from result cursor
-		var id int
-		var code string
-		var name string
-		var program string
-		row.Scan(&id, &code, &name, &program)
+		s := Student{}
+		students = append(students, s)
+		row.Scan(&s.Id, &s.Code, &s.Name, &s.Program)
 		slog.Info("Students info.", slog.Group("student",
-			slog.Int("id", id),
-			slog.String("code", code),
-			slog.String("name", name),
-			slog.String("program", program),
+			slog.Int("id", s.Id),
+			slog.String("code", s.Code),
+			slog.String("name", s.Name),
+			slog.String("program", s.Program),
 		))
+
 	}
+
+	return students
 }
