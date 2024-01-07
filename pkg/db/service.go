@@ -19,6 +19,7 @@ func New() *Storage {
 }
 
 func (s Storage) Close() {
+	slog.Info("Close database connection.")
 	s.db.Close()
 }
 

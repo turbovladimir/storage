@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	_ "github.com/mattn/go-sqlite3" // Import go-sqlite3 library
 	"github.com/turbovladimir/RestApi/pkg/api"
@@ -15,13 +16,7 @@ func main() {
 	mylog.Init()
 	s := db.New()
 
-	defer func() {
-		if err := recover(); err != nil {
-			slog.Error("App get panic", err)
-		}
-
-		s.Close()
-	}()
+	defer func() { s.Close() }()
 
 	routes := []api.Route{
 		{
@@ -44,19 +39,35 @@ func main() {
 				out, err := json.Marshal(students)
 
 				if err != nil {
-					context.JSON(http.StatusInternalServerError, api.ResponseData{
-						Error: err.Error(),
-					})
-				} else {
-					context.JSON(http.StatusOK, api.ResponseData{
-						Data: string(out),
-					})
+					panic("Cannot marshal students")
 				}
+
+				context.JSON(http.StatusOK, api.ResponseData{
+					Data: string(out),
+				})
 			},
 		},
 	}
 
-	router := api.NewRouter(routes)
+	midds := []gin.HandlerFunc{
+		func(context *gin.Context) {
+			defer func() {
+				if err := recover(); err != nil {
+					errStr := fmt.Sprintf("%s", err)
+					slog.Error(`App get panic`, err)
+					context.Abort()
+
+					context.JSON(http.StatusInternalServerError, api.ResponseData{
+						Error: errStr,
+					})
+				}
+			}()
+
+			context.Next()
+		},
+	}
+
+	router := api.NewRouter(routes, midds)
 
 	router.Run("8087")
 }

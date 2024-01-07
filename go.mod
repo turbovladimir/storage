@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/gin-gonic/gin v1.9.1
 	github.com/mattn/go-sqlite3 v1.14.19
-	github.com/turbovladimir/RestApi v0.0.0-20240107143227-0c35f1c92a3b
+	github.com/turbovladimir/RestApi v0.0.0-20240107150631-41617eb5e6a1
 	golang.org/x/exp v0.0.0-20240103183307-be819d1f06fc
 )
 

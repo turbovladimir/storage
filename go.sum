@@ -76,6 +76,8 @@ github.com/stretchr/testify v1.8.3 h1:RP3t2pwF7cMEbC1dqtB6poj3niw/9gnV4Cjg5oW5gt
 github.com/stretchr/testify v1.8.3/go.mod h1:sz/lmYIOXD/1dqDmKjjqLyZ2RngseejIcXlSw2iwfAo=
 github.com/turbovladimir/RestApi v0.0.0-20240107143227-0c35f1c92a3b h1:HuY0jz3hjbVg7seVrL4oa8TajiSFyE+HT/cZNWfIHGI=
 github.com/turbovladimir/RestApi v0.0.0-20240107143227-0c35f1c92a3b/go.mod h1:syQgJ5nVjnkqwHoZ1/TaVleE9VzWuuidvP+MWw+qyIQ=
+github.com/turbovladimir/RestApi v0.0.0-20240107150631-41617eb5e6a1 h1:MUBHuHE79AOWD9+V4IqYT3gy0tO4ndvtbLcEXO5WkQ8=
+github.com/turbovladimir/RestApi v0.0.0-20240107150631-41617eb5e6a1/go.mod h1:syQgJ5nVjnkqwHoZ1/TaVleE9VzWuuidvP+MWw+qyIQ=
 github.com/twitchyliquid64/golang-asm v0.15.1 h1:SU5vSMR7hnwNxj24w34ZyCi/FmDZTkS4MhqMhdFk5YI=
 github.com/twitchyliquid64/golang-asm v0.15.1/go.mod h1:a1lVb/DtPvCB8fslRZhAngC2+aY1QWCk3Cedj/Gdt08=
 github.com/ugorji/go/codec v1.2.11 h1:BMaWp1Bb6fHwEtbplGBGJ498wD+LKlNSl25MjdZY4dU=
