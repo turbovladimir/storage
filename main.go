@@ -1,73 +1,32 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	_ "github.com/mattn/go-sqlite3" // Import go-sqlite3 library
-	"github.com/turbovladimir/RestApi/pkg/api"
-	"github.com/turbovladimir/storage.git/pkg/db"
+	"github.com/joho/godotenv"
 	mylog "github.com/turbovladimir/storage.git/pkg/log"
-	"golang.org/x/exp/slog"
-	"net/http"
+	"github.com/turbovladimir/storage.git/pkg/routes"
+	"log"
+	"os"
 )
+
+type Response struct {
+	Success bool        `json:"success"`
+	Data    interface{} `json:"data"`
+	Error   string      `json:"error"`
+}
 
 func main() {
 	mylog.Init()
-	s := db.New()
-
-	defer func() { s.Close() }()
-
-	routes := []api.Route{
-		{
-			Method: api.MethodGet,
-			Path:   "repository/create",
-			Handler: func(context *gin.Context) {
-				s.CreateTable()
-				s.FillTable()
-
-				context.JSON(http.StatusOK, api.ResponseData{
-					Data: "Table created and filled successfully",
-				})
-			},
-		},
-		{
-			Method: api.MethodGet,
-			Path:   "repository/list",
-			Handler: func(context *gin.Context) {
-				students := s.DisplayStudents()
-				out, err := json.Marshal(students)
-
-				if err != nil {
-					panic("Cannot marshal students")
-				}
-
-				context.JSON(http.StatusOK, api.ResponseData{
-					Data: string(out),
-				})
-			},
-		},
+	err := godotenv.Load(".env.dev")
+	if err != nil {
+		log.Fatal("Error loading .env file")
 	}
+	e := gin.Default()
+	controller := routes.NewController(e)
+	controller.SetupRoutes()
 
-	midds := []gin.HandlerFunc{
-		func(context *gin.Context) {
-			defer func() {
-				if err := recover(); err != nil {
-					errStr := fmt.Sprintf("%s", err)
-					slog.Error(`App get panic`, err)
-					context.Abort()
-
-					context.JSON(http.StatusInternalServerError, api.ResponseData{
-						Error: errStr,
-					})
-				}
-			}()
-
-			context.Next()
-		},
+	if err = e.Run(fmt.Sprintf(":%s", os.Getenv("SERVER_PORT"))); err != nil {
+		log.Fatal(err)
 	}
-
-	router := api.NewRouter(routes, midds)
-
-	router.Run("8087")
 }
