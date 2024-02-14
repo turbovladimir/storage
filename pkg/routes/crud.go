@@ -11,9 +11,9 @@ const (
 )
 
 type CRUDRequest struct {
-	Action string      `json:"action"`
-	Entity string      `json:"entity"`
-	Data   interface{} `json:"data"`
+	Action string      `json:"action" binding:"required"`
+	Entity string      `json:"entity" binding:"required"`
+	Data   interface{} `json:"data" binding:"required"`
 }
 
 func HandlerCRUD(c *gin.Context) {
@@ -21,7 +21,8 @@ func HandlerCRUD(c *gin.Context) {
 
 	var req CRUDRequest
 
-	if err := c.BindJSON(&req); err != nil {
+	if err := c.ShouldBindJSON(&req); err != nil {
+		ResponseBadRequest(c, err)
 		return
 	}
 

@@ -10,12 +10,6 @@ import (
 	"os"
 )
 
-type Response struct {
-	Success bool        `json:"success"`
-	Data    interface{} `json:"data"`
-	Error   string      `json:"error"`
-}
-
 func main() {
 	mylog.Init()
 	err := godotenv.Load(".env.dev")
