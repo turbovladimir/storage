@@ -3,42 +3,62 @@ package repository
 import (
 	"fmt"
 	"github.com/turbovladimir/storage.git/pkg/db"
-	"github.com/turbovladimir/storage.git/pkg/models"
+	"github.com/turbovladimir/storage.git/pkg/db/models"
 	"os"
+	"strings"
 
 	"gorm.io/gorm"
 )
 
-const (
-	ErrorRecordNotFound = "record not found"
-)
+type ModelRepository interface {
+	Find(filter map[string]interface{}, models interface{})
+	Create(params *CreateParams)
+	Update(params *UpdateParams)
+}
 
 type Repository struct {
-	DB     *gorm.DB
-	entity interface{}
+	DB *gorm.DB
 }
 
-func CreateRegistrationRepo() *Repository {
-	return new(db.NewConnect(&db.Config{os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_NAME")}), models.Registration{})
-}
+var repo *Repository
 
-func CreateOfferRepo() *Repository {
-	return new(db.NewConnect(&db.Config{os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_NAME")}), models.Offer{})
-}
-
-func new(db *gorm.DB, entity interface{}) *Repository {
-	db = db.Model(entity)
-	r := Repository{db, entity}
-
-	return &r
-}
-
-func (r *Repository) Create(object interface{}) error {
-	if result := r.DB.Create(object); result.Error != nil {
-		return result.Error
+func New() ModelRepository {
+	if repo == nil {
+		c := db.NewConnect(&db.Config{os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_NAME")})
+		repo = &Repository{c}
 	}
 
-	return nil
+	return repo
+}
+
+func (r *Repository) Find(filter map[string]interface{}, m interface{}) {
+	var tx *gorm.DB
+
+	for field, expr := range filter {
+		if strings.Contains(field, "_not") {
+			field = strings.ReplaceAll(field, "_not", "")
+			if field == "id" {
+				tx = r.DB.Not(expr)
+			}
+
+		}
+	}
+
+	tx.Find(m)
+
+	if err := tx.Error; err != nil {
+		panic("Error occurrence when after scan repository.")
+	}
+}
+
+func (r *Repository) Update(params *UpdateParams) {
+
+}
+
+func (r *Repository) Create(params *CreateParams) {
+	result := r.DB.Model(models.Registration{}).Save(params.Models)
+
+	params.Error = result.Error
 }
 
 func (r *Repository) GetBy(filter map[string][]string, target interface{}) {

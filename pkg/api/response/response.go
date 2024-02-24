@@ -1,11 +1,17 @@
-package routes
+package response
 
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
-func ResponseErrorInternal(c *gin.Context, err error) {
+type Response struct {
+	Success bool        `json:"success"`
+	Data    interface{} `json:"data"`
+	Error   string      `json:"error"`
+}
+
+func ErrorInternal(c *gin.Context, err error) {
 	c.Error(err)
 	c.JSON(http.StatusInternalServerError, Response{
 		Success: false,
@@ -13,7 +19,7 @@ func ResponseErrorInternal(c *gin.Context, err error) {
 	})
 }
 
-func ResponseBadRequest(c *gin.Context, err error) {
+func BadRequest(c *gin.Context, err error) {
 	c.Error(err)
 	c.JSON(http.StatusBadRequest, Response{
 		Success: false,
@@ -22,7 +28,7 @@ func ResponseBadRequest(c *gin.Context, err error) {
 	})
 }
 
-func ResponseSuccess(c *gin.Context, data interface{}) {
+func Success(c *gin.Context, data interface{}) {
 	c.JSON(http.StatusOK, Response{
 		Success: true,
 		Error:   "",

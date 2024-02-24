@@ -2,9 +2,9 @@ package db
 
 import (
 	"fmt"
+	"github.com/turbovladimir/storage.git/pkg/db/models"
 	"log"
 
-	"github.com/turbovladimir/storage.git/pkg/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )

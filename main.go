@@ -2,10 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	"github.com/turbovladimir/storage.git/pkg/api"
 	mylog "github.com/turbovladimir/storage.git/pkg/log"
-	"github.com/turbovladimir/storage.git/pkg/routes"
 	"log"
 	"os"
 )
@@ -16,11 +15,10 @@ func main() {
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
-	e := gin.Default()
-	controller := routes.NewController(e)
-	controller.SetupRoutes()
+	router := api.NewRouter()
+	router.SetupRoutes()
 
-	if err = e.Run(fmt.Sprintf(":%s", os.Getenv("SERVER_PORT"))); err != nil {
+	if err = router.Run(fmt.Sprintf(":%s", os.Getenv("SERVER_PORT"))); err != nil {
 		log.Fatal(err)
 	}
 }
